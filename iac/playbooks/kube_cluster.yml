@@ -1,0 +1,33 @@
+---
+- name: Install Canonical Kubernetes
+  hosts: all
+  become: true
+
+  tasks:
+   #---------------------------------------------------------
+   # INSTALL KUBERNETES CLUSTER
+   #---------------------------------------------------------
+    - name: Install Canonical Kubernetes snap
+      community.general.snap:
+        name: k8s
+        classic: true
+
+    - name: Bootstrap Kubernetes
+      ansible.builtin.command:
+        cmd: k8s bootstrap
+        creates: /var/snap/k8s/common/var/lib/kubernetes/cluster-lock
+
+    - name: Wait for Kubernetes to become ready
+      ansible.builtin.command:
+        cmd: k8s status --wait-ready --timeout 3m
+      changed_when: false
+
+    - name: Show Kubernetes nodes
+      ansible.builtin.command:
+        cmd: k8s kubectl get nodes
+      register: kubernetes_nodes
+      changed_when: false
+
+    - name: Kubernetes nodes
+      ansible.builtin.debug:
+        var: kubernetes_nodes.stdout_lines

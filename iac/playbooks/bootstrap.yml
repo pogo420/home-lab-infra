@@ -1,0 +1,32 @@
+---
+- name: Bootstrap home lab environment
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    # ---------------------------------------------------------
+    # UPGRADE AND INSTALL ESSENTIAL PACKAGES
+    # ---------------------------------------------------------
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade installed packages
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Install essential packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - wget
+          - git
+          - vim
+          - htop
+          - unzip
+          - jq
+          - net-tools
+        state: present
